@@ -42,4 +42,5 @@ urlpatterns = [
     path('arriendos/',views.ListaArriendos,name='arriendos'),
 
     path('newcliente',views.newcliente,name='newcliente'),
+    path('updcliente/<int:id>',views.updcliente,name='updcliente'),
 ]

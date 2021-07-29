@@ -56,7 +56,7 @@ def ActualizaClientes(request,pk):
 
     if serializer.is_valid():
         serializer.save()
-
+    return redirect('../clientes')
     return Response(serializer.data)
 
 @api_view(['POST'])
@@ -217,3 +217,10 @@ def TotalArriendosMes(request):
 @api_view(['GET'])
 def newcliente(request):
     return render(request,'cliente_new.html')
+
+@api_view(['GET'])
+def updcliente(request,id=0):
+    context={
+        'id':id
+    }
+    return render(request,'cliente_edit.html',context)
