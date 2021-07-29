@@ -1,0 +1,62 @@
+{% extends './base.html' %}
+{% block content %}
+<style>
+    #loading {
+      display: none;
+    }
+  </style>
+<div class="container-fluid"></div>
+<h1>Arriendos</h1>
+<table id="example" class="display" width="100%">
+    <thead><tr><th>cliente</th><th>costo_diario</th><th>días</th><th>empresa</th><th>fecha arriendo</th><th>id</th></tr></thead>
+</table>
+
+
+    <div id="mensaje"></div>
+    <div id="loading">cargando...</div>
+    
+
+<script>
+    
+
+
+    var loading = document.getElementById('loading');
+   // var mensaje = document.getElementById('mensaje');
+    var boton = document.getElementById('carga_ajax');
+    
+    $( document ).ready(function() {
+    loading.style.display = 'block';
+    axios.get('http://localhost:8000/arriendo-get/', {
+        responseType: 'text'
+    })
+        .then(function(res) {
+        if(res.status==200) {
+            //mensaje.innerHTML = res.data;
+            console.log(res)
+            var oTblReport = $("#example")
+            
+            oTblReport.DataTable ({
+                "data" : res.data,
+            "columns": [
+            { "data": "cliente" },
+            { "data": "costo_diario" },
+            { "data": "dias" },
+            { "data": "empresa" },
+            { "data": "fecha_arriendo" },
+            { "data": "id" }
+        ]
+            });
+        }
+        console.log(res);
+        })
+        .catch(function(err) {
+        mensaje.innerText = 'Error de conexión ' + err;
+        })
+        .then(function() {
+        loading.style.display = 'none';
+        });
+    });
+    
+</script>
+</div>
+{% endblock %}

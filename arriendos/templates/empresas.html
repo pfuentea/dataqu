@@ -1,0 +1,57 @@
+{% extends './base.html' %}
+{% block content %}
+<style>
+    #loading {
+      display: none;
+    }
+  </style>
+<div class="container-fluid"></div>
+<h1>Empresas</h1>
+<table id="example" class="display" width="100%">
+    <thead><tr><th>id</th><th>nombre</th></tr></thead>
+</table>
+
+
+    <div id="mensaje"></div>
+    <div id="loading">cargando...</div>
+    
+
+<script>
+    
+
+
+    var loading = document.getElementById('loading');
+   // var mensaje = document.getElementById('mensaje');
+    var boton = document.getElementById('carga_ajax');
+    
+    $( document ).ready(function() {
+    loading.style.display = 'block';
+    axios.get('http://localhost:8000/empresa-get/', {
+        responseType: 'text'
+    })
+        .then(function(res) {
+        if(res.status==200) {
+            //mensaje.innerHTML = res.data;
+            var oTblReport = $("#example")
+            
+            oTblReport.DataTable ({
+                "data" : res.data,
+            "columns": [
+            { "data": "id" },
+            { "data": "nombre" }
+        ]
+            });
+        }
+        console.log(res);
+        })
+        .catch(function(err) {
+        mensaje.innerText = 'Error de conexión ' + err;
+        })
+        .then(function() {
+        loading.style.display = 'none';
+        });
+    });
+    
+</script>
+</div>
+{% endblock %}

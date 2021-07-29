@@ -1,0 +1,258 @@
+{% extends './base.html' %}
+{% block content %}
+<style>
+    #loading {
+      display: none;
+    }
+    #total_arriendos{
+        font-weight: bold;
+    }
+  </style>
+<div class="container-fluid"></div>
+<h1>Home</h1>
+    Total arriendos del mes: <span id="total_arriendos"></span><br>
+    <select name="empresas" id="empresas">
+        <option id="0">Todas las empresas</option>
+    </select>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-3">
+            <div class="card card-margin">
+                <div class="card-header no-border">
+                    <h5 class="card-title"> Cliente con mayor monto</h5>
+                </div>
+                <div class="card-body pt-0">
+                    <span id="cliente_top"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col"></div>
+        <div class="col-3">
+            <div class="card card-margin">
+                <div class="card-header no-border">
+                    <h5 class="card-title"> Cliente con menor monto</h5>
+                </div>
+                <div class="card-body pt-0">
+                    <span id="cliente_bot"></span>
+                </div>
+            </div>            
+        </div>
+        <div class="col"></div>
+        <div class="col-3">
+            <div class="card card-margin">
+                <div class="card-header no-border">
+                    <h5 class="card-title"> Propuesta</h5>
+                </div>
+                <div class="card-body pt-0">
+                    DATOS
+                </div>
+            </div>
+        </div>
+        <div class="col"></div>
+    </div>
+
+
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-6">
+            <div class="card card-margin">
+            <div class="card-header no-border">
+                <h5 class="card-title"> Grafico</h5>
+            </div>
+            <div class="card-body pt-0">
+
+            </div>
+        </div>
+    </div>
+        <div class="col"></div>
+    </div>
+
+ 
+    <div id="mensaje"></div>
+    <div id="loading">cargando...</div>
+    
+
+<script>
+    $( document ).ready(function() {
+        // total ariendos del mes
+        axios.get('http://localhost:8000/arriendos-total/', {
+            responseType: 'text'
+        })
+        .then(function(res) {
+        if(res.status==200) {
+            //mensaje.innerHTML = res.data;
+            $('#total_arriendos').append(res.data)
+        }
+        //console.log(res);
+        })
+        .catch(function(err) {
+        mensaje.innerText = 'Error de conexión ' + err;
+        })
+        .then(function() {
+        loading.style.display = 'none';
+        });
+
+        //cliente que mas gasta
+        axios.get('http://localhost:8000/cliente-top/', {
+            responseType: 'text'
+        })
+        .then(function(res) {
+        if(res.status==200) {
+            //mensaje.innerHTML = res.data;
+            resultado=res.data.nombre+' ($'+res.data.suma_total+')'
+            $('#cliente_top').append(resultado)
+        }
+        //console.log(res);
+        })
+        .catch(function(err) {
+        mensaje.innerText = 'Error de conexión ' + err;
+        })
+        .then(function() {
+        loading.style.display = 'none';
+        });
+         //cliente que menos gasta
+         axios.get('http://localhost:8000/cliente-bot/', {
+            responseType: 'text'
+        })
+        .then(function(res) {
+        if(res.status==200) {
+            //mensaje.innerHTML = res.data;
+            resultado=res.data.nombre+' ($'+res.data.suma_total+')'
+            $('#cliente_bot').append(resultado)
+        }
+        //console.log(res);
+        })
+        .catch(function(err) {
+        mensaje.innerText = 'Error de conexión ' + err;
+        })
+        .then(function() {
+        loading.style.display = 'none';
+        });
+        //llenamos el combo de empresas
+        axios.get('http://localhost:8000/empresa-get/', {
+            responseType: 'text'
+        })
+        .then(function(res) {
+        if(res.status==200) {
+            //mensaje.innerHTML = res.data;
+            
+            $.each(res.data, function(i,item){
+                console.log(item.nombre)
+                option='<option id=\"'+item.id+'\">'+item.nombre+'</option>'
+                $('#empresas').append(option)
+            });
+        }
+        //console.log(res);
+        })
+        .catch(function(err) {
+        mensaje.innerText = 'Error de conexión ' + err;
+        })
+        .then(function() {
+        loading.style.display = 'none';
+        });
+    });
+
+
+
+    
+
+    var loading = document.getElementById('loading');
+    var mensaje = document.getElementById('mensaje');
+    var boton = document.getElementById('carga_ajax');
+    var selector = document.getElementById('empresas');
+    // al cambiar de empresa
+    $('#empresas').change( function() {
+        loading.style.display = 'block';
+        empresa=$('#empresas').children(":selected").attr('id');
+        //alert(empresa)
+        //cliente que mas gasta
+
+        axios.get('http://localhost:8000/cliente-top/'+empresa, {
+            responseType: 'text'
+        })
+        .then(function(res) {
+        if(res.status==200) {
+            resultado=res.data.nombre+' ($'+res.data.suma_total+')'
+            $('#cliente_top').text(resultado)
+        }
+        //console.log(res);
+        })
+        .catch(function(err) {
+        mensaje.innerText = 'Error de conexión ' + err;
+        })
+        .then(function() {
+        loading.style.display = 'none';
+        });
+
+         //cliente que menos gasta
+         axios.get('http://localhost:8000/cliente-bot/'+empresa, {
+            responseType: 'text'
+        })
+        .then(function(res) {
+            if(res.status==200) {
+                resultado=res.data.nombre+' ($'+res.data.suma_total+')'
+                $('#cliente_bot').text(resultado)
+            }
+        })
+        .catch(function(err) {
+        mensaje.innerText = 'Error de conexión ' + err;
+        })
+        .then(function() {
+        loading.style.display = 'none';
+        });
+
+
+    });
+
+
+
+
+
+
+
+    var boton = document.getElementById('json_get');
+    boton.addEventListener('click', function() {
+      loading.style.display = 'block';
+      axios.get('http://localhost:8000/cliente-det/1', {
+        responseType: 'json'
+      })
+        .then(function(res) {
+          if(res.status==200) {
+            console.log(res.data);
+            mensaje.innerHTML = res.data.title;
+          }
+          console.log(res);
+        })
+        .catch(function(err) {
+          console.log(err);
+        })
+        .then(function() {
+          loading.style.display = 'none';
+        });
+    });
+
+    var boton = document.getElementById('json_post');
+    boton.addEventListener('click', function() {
+      loading.style.display = 'block';
+      axios.post('https://jsonplaceholder.typicode.com/posts', {
+        data: {
+          userId: 1,
+          title: 'Esto es un post nuevo',
+          body: 'cuerpo de este post. Me gusta la librería Axios!!'
+        }
+      })
+        .then(function(res) {
+          if(res.status==201) {
+            mensaje.innerHTML = 'El nuevo Post ha sido almacenado con id: ' + res.data.id;
+          }
+        })
+        .catch(function(err) {
+          console.log(err);
+        })
+        .then(function() {
+          loading.style.display = 'none';
+        });
+    });
+</script>
+</div>
+{% endblock %}
