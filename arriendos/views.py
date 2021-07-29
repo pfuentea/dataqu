@@ -9,9 +9,12 @@ from django.shortcuts import render,redirect,get_object_or_404
 from rest_framework.renderers import JSONRenderer
 import json 
 from .forms import ClienteForm
-from django.views.generic import ListView, DetailView
 from django.db.models import Avg, Count, Min, Sum,F
 import datetime
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
+
 
 @api_view(['GET'])
 def Index(request):
@@ -36,12 +39,14 @@ def getClientesDet(request,pk):
     serializer = ClienteSerializer(clientes, many=False)
     return Response(serializer.data)
 
+
 @api_view(['POST'])
 def CreaClientes(request):
     serializer = ClienteSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
 
+    return redirect('../clientes')
     return Response(serializer.data)
 
 @api_view(['POST'])
@@ -139,7 +144,13 @@ def BorraArriendos(request,pk):
 
 '''Aca terminan el crud'''
 def ListaClientes(request):
-    return render(request,'clientes.html')
+    clientes = Cliente.objects.all().order_by('-id')   
+    serializer = ClienteSerializer(clientes, many=True)
+    context={
+        "data":clientes
+    }   
+    
+    return render(request,'clientes.html',context)
 
 def ListaEmpresas(request):
     return render(request,'empresas.html')
@@ -202,3 +213,7 @@ def TotalArriendosMes(request):
     today = datetime.date.today()
     total_arriendos = Arriendo.objects.filter(fecha_arriendo__year=today.year,fecha_arriendo__month=today.month).count()
     return Response(total_arriendos)
+
+@api_view(['GET'])
+def newcliente(request):
+    return render(request,'cliente_new.html')

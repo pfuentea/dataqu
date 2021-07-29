@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path,include
 from . import views
 from python_stack.django.django_intro.dataqu import arriendos
-
+from django.conf.urls import  url
 
 
 
@@ -40,4 +40,6 @@ urlpatterns = [
     path('clientes/',views.ListaClientes,name='clientes'),
     path('empresas/',views.ListaEmpresas,name='empresas'),
     path('arriendos/',views.ListaArriendos,name='arriendos'),
+
+    path('newcliente',views.newcliente,name='newcliente'),
 ]
