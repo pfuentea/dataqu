@@ -12,8 +12,8 @@ urlpatterns = [
     path('cliente-get/',views.ClientesList,name='cliente-get'),
     path('cliente-det/<str:pk>',views.getClientesDet,name='cliente-det'),
     path('cliente-create/',views.CreaClientes,name='cliente-create'),
-    path('cliente-update/<str:pk>',views.ActualizaClientes,name='cliente-update'),
-    path('cliente-delete/<str:pk>',views.BorraClientes,name='cliente-delete'),
+    path('cliente-update/<int:pk>',views.ActualizaClientes,name='cliente-update'),
+    path('cliente-delete/<int:pk>',views.BorraClientes,name='cliente-delete'),
     path('empresa-get/',views.EmpresasList,name='empresa-get'),
     path('empresa-det/<str:pk>',views.getEmpresasDet,name='empresa-det'),
     path('empresa-create/',views.CreaEmpresas,name='empresa-create'),
@@ -38,9 +38,13 @@ urlpatterns = [
     path('cliente-bot/<int:emp_id>',views.getClientLessExpenses,name='cliente-bot'), 
 
     path('clientes/',views.ListaClientes,name='clientes'),
-    path('empresas/',views.ListaEmpresas,name='empresas'),
-    path('arriendos/',views.ListaArriendos,name='arriendos'),
-
     path('newcliente',views.newcliente,name='newcliente'),
     path('updcliente/<int:id>',views.updcliente,name='updcliente'),
+
+
+    path('empresas/',views.ListaEmpresas,name='empresas'),
+    path('newempresa',views.newempresa,name='newempresa'),
+    path('updempresa/<int:id>',views.updempresa,name='updempresa'),
+
+    path('arriendos/',views.ListaArriendos,name='arriendos'),
 ]

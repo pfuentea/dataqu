@@ -59,10 +59,11 @@ def ActualizaClientes(request,pk):
     return redirect('../clientes')
     return Response(serializer.data)
 
-@api_view(['POST'])
+@api_view(['GET'])
 def BorraClientes(request,pk):
     cliente = Cliente.objects.get(id=pk)
     cliente.delete()
+    return redirect('../clientes')
     return Response('Cliente eliminado exitosamente')
 
 
@@ -73,12 +74,10 @@ def EmpresasList(request):
     serializer = EmpresaSerializer(empresas, many=True)
     return Response(serializer.data)
 
-
-
 @api_view(['GET'])
 def getEmpresasDet(request,pk):
-    empresas = Empresa.objects.all()    
-    serializer = EmpresaSerializer(empresas, many=True)
+    empresas = Empresa.objects.get(id=pk)
+    serializer = EmpresaSerializer(empresas, many=False)
     return Response(serializer.data)
 
 @api_view(['POST'])
@@ -86,7 +85,7 @@ def CreaEmpresas(request):
     serializer = EmpresaSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-
+    return redirect('../empresas')
     return Response(serializer.data)
 
 @api_view(['POST'])
@@ -96,13 +95,14 @@ def ActualizaEmpresas(request,pk):
 
     if serializer.is_valid():
         serializer.save()
-
+    return redirect('../empresas')  
     return Response(serializer.data)
 
-@api_view(['POST'])
+@api_view(['GET'])
 def BorraEmpresas(request,pk):
     empresa = Empresa.objects.get(id=pk)
     empresa.delete()
+    return redirect('../empresas')
     return Response('Empresa eliminada exitosamente')
 
 ''' Empieza el crud de arriendos'''
@@ -123,7 +123,7 @@ def CreaArriendos(request):
     serializer = ArriendoSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-
+    return redirect('../arriendos')
     return Response(serializer.data)
 
 @api_view(['POST'])
@@ -133,13 +133,14 @@ def ActualizaArriendos(request,pk):
 
     if serializer.is_valid():
         serializer.save()
-
+    return redirect('../arriendos')
     return Response(serializer.data)
 
-@api_view(['POST'])
+@api_view(['GET'])
 def BorraArriendos(request,pk):
     arriendo = Arriendo.objects.get(id=pk)
     arriendo.delete()
+    return redirect('../arriendos')
     return Response('Empresa eliminada exitosamente')
 
 '''Aca terminan el crud'''
@@ -153,7 +154,13 @@ def ListaClientes(request):
     return render(request,'clientes.html',context)
 
 def ListaEmpresas(request):
-    return render(request,'empresas.html')
+    empresas = Empresa.objects.all().order_by('-id')   
+    serializer = EmpresaSerializer(empresas, many=True)
+    context={
+        "data":empresas
+    }   
+    
+    return render(request,'empresas.html',context)
 
 def ListaArriendos(request):
     return render(request,'arriendos.html')
@@ -224,3 +231,14 @@ def updcliente(request,id=0):
         'id':id
     }
     return render(request,'cliente_edit.html',context)
+
+@api_view(['GET'])
+def newempresa(request):
+    return render(request,'empresa_new.html')
+
+@api_view(['GET'])
+def updempresa(request,id=0):
+    context={
+        'id':id
+    }
+    return render(request,'empresa_edit.html',context)

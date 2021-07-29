@@ -1,0 +1,60 @@
+{% extends './base.html' %}
+{% block content %}
+<form method="POST" class="post-form" action="../empresa-update/{{id}}" id="empresa_new" name="empresa_new">{% csrf_token %}
+    <div class="container">
+        <div class="form-group row">
+            <label class="col-sm-1 col-form-label"></label>
+            <div class="col-sm-4">
+                <h3>Editar Empresa</h3>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Nombre Empresa</label>
+            <div class="col-sm-4">
+                <input type="text" id="nombre" name="nombre">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-4">
+               <button type="button" class="btn btn-primary" id="btn_enviar">Enviar</button>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="data" value="" name="data">
+</form>
+<div id="mensaje"></div>
+<div id="loading">cargando...</div>
+<script>
+$( document ).ready(function() {
+    loading.style.display = 'block';
+    axios.get('http://localhost:8000/empresa-det/{{id}}', {
+        responseType: 'text'
+        })
+        .then(function(res) {
+        if(res.status==200) {
+            //mensaje.innerHTML = res.data;
+            $('#nombre').val(res.data.nombre);
+        }
+        console.log(res);
+        })
+        .catch(function(err) {
+        mensaje.innerText = 'Error de conexión ' + err;
+        })
+        .then(function() {
+        loading.style.display = 'none';
+        });
+    });
+    
+    $('#btn_enviar').click(function(){
+        let nombre= $('#nombre').val();
+        let apellido= $('#apellido').val();
+        let rut= $('#rut').val();
+        data='{"nombre":"'+nombre+'", "apellido":"'+apellido+'","rut":"'+rut+'"}';       
+        $('#data').val(data);           
+        //axios.post(url, data, headers)
+        $('#empresa_new').submit();
+        
+    });
+</script>
+{% endblock %}
