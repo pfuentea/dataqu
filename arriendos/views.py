@@ -85,6 +85,8 @@ def CreaEmpresas(request):
     serializer = EmpresaSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
+        print("pude")
+        print(serializer)
     return redirect('../empresas')
     return Response(serializer.data)
 
@@ -108,21 +110,33 @@ def BorraEmpresas(request,pk):
 ''' Empieza el crud de arriendos'''
 @api_view(['GET'])
 def ArriendosList(request):
-    arriendos = Arriendo.objects.all().order_by('-id')    
+    arriendos = Arriendo.objects.all().order_by('-id')
+    #print(arriendos)
+    #import pdb; pdb.set_trace()   
+    
+    #import pdb; pdb.set_trace()   
     serializer = ArriendoSerializer(arriendos, many=True)
     return Response(serializer.data)
+    #return JsonResponse(arriendos)
+
 
 @api_view(['GET'])
 def getArriendosDet(request,pk):
-    arriendos = Arriendo.objects.all()    
-    serializer = ArriendoSerializer(arriendos, many=True)
+    arriendos = Arriendo.objects.get(id=pk)    
+    serializer = ArriendoSerializer(arriendos, many=False)
     return Response(serializer.data)
 
 @api_view(['POST'])
 def CreaArriendos(request):
     serializer = ArriendoSerializer(data=request.data)
+    
     if serializer.is_valid():
         serializer.save()
+        print("pude")
+        #print(serializer)
+    else:
+        print("no pude")
+        #print(serializer)
     return redirect('../arriendos')
     return Response(serializer.data)
 
@@ -133,6 +147,9 @@ def ActualizaArriendos(request,pk):
 
     if serializer.is_valid():
         serializer.save()
+    else:
+        print("no pude")
+        print(serializer)
     return redirect('../arriendos')
     return Response(serializer.data)
 
@@ -163,7 +180,19 @@ def ListaEmpresas(request):
     return render(request,'empresas.html',context)
 
 def ListaArriendos(request):
-    return render(request,'arriendos.html')
+    arriendos = Arriendo.objects.all().order_by('-id')   
+    arriendos = [{
+        'id': arr.id,
+        'cliente': arr.cliente.nombre+' '+arr.cliente.apellido,
+        'costo_diario': arr.costo_diario,
+        'dias': arr.dias,
+        'fecha_arriendo': arr.fecha_arriendo,
+        'empresa': arr.empresa.nombre
+    } for arr in arriendos]
+    context={
+        "data":arriendos
+    }   
+    return render(request,'arriendos.html',context)
 
 @api_view(['GET'])
 def getClientSortByLastName(request):
@@ -242,3 +271,14 @@ def updempresa(request,id=0):
         'id':id
     }
     return render(request,'empresa_edit.html',context)
+
+@api_view(['GET'])
+def newarriendo(request):
+    return render(request,'arriendo_new.html')
+
+@api_view(['GET'])
+def updarriendo(request,id=0):
+    context={
+        'id':id
+    }
+    return render(request,'arriendo_edit.html',context)

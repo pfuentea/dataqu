@@ -1,29 +1,46 @@
 {% extends './base.html' %}
 {% block content %}
-<form method="POST" class="post-form" action="../cliente-update/{{id}}" id="cliente_new" name="cliente_new">{% csrf_token %}
+<form method="POST" class="post-form" action="../arriendo-update/{{id}}" id="arriendo_edit" name="arriendo_edit">{% csrf_token %}
     <div class="container">
         <div class="form-group row">
             <label class="col-sm-1 col-form-label"></label>
             <div class="col-sm-4">
-                <h3>Editar Cliente</h3>
+                <h3>Editar Arriendo</h3>
             </div>
         </div>
         <div class="form-group row">
-            <label class="col-sm-2 col-form-label">Nombre Cliente</label>
+            <label class="col-sm-2 col-form-label">Cliente</label>
             <div class="col-sm-4">
-                <input type="text" id="nombre" name="nombre">
+                <select name="cliente" id="cliente">
+                    <option value="0">Seleccione un cliente</option>
+                </select>
+                
             </div>
         </div>
         <div class="form-group row">
-            <label class="col-sm-2 col-form-label">Apellido Cliente</label>
+            <label class="col-sm-2 col-form-label">Empresa</label>
             <div class="col-sm-4">
-                <input type="text" id="apellido" name="apellido">
+                <select name="empresa" id="empresa">
+                    <option value="0">Seleccione un empresa</option>
+                </select>
             </div>
         </div>
         <div class="form-group row">
-            <label class="col-sm-2 col-form-label">Rut Cliente</label>
+            <label class="col-sm-2 col-form-label">Costo diario</label>
             <div class="col-sm-4">
-                <input type="text" id="rut" name="rut">
+                <input type="text" id="costo" name="costo">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Días</label>
+            <div class="col-sm-4">
+                <input type="text" id="dias" name="dias">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Fecha Arriendo</label>
+            <div class="col-sm-4">
+                <input type="date" id="fecha" name="fecha">
             </div>
         </div>
         <div class="form-group row">
@@ -37,18 +54,28 @@
 </form>
 <div id="mensaje"></div>
 <div id="loading">cargando...</div>
+
 <script>
 $( document ).ready(function() {
+    let cli_id=0;
+    let emp_id=0;
+
+
     loading.style.display = 'block';
-    axios.get('http://localhost:8000/cliente-det/{{id}}', {
+    axios.get('http://localhost:8000/arriendo-det/{{id}}', {
         responseType: 'text'
         })
         .then(function(res) {
         if(res.status==200) {
             //mensaje.innerHTML = res.data;
-            $('#nombre').val(res.data.nombre);
-            $('#apellido').val(res.data.apellido);
-            $('#rut').val(res.data.rut);
+            cli_id= res.data.cliente;
+            emp_id=res.data.empresa;
+           // $('#cliente option[value='+cli_id+']').attr("selected"=true);
+           // $('#empresa option[value='+emp_id+']').attr("selected"=true);
+
+            $('#costo').val(res.data.costo_diario);
+            $('#dias').val(res.data.dias);
+            $('#fecha').val(res.data.fecha_arriendo);
         }
         console.log(res);
         })
@@ -58,19 +85,75 @@ $( document ).ready(function() {
         .then(function() {
         loading.style.display = 'none';
         });
+
+        // llenamos el combo de empresas
+        axios.get('http://localhost:8000/empresa-get/', {
+            responseType: 'text'
+        })
+        .then(function(res) {
+            let selected="";
+
+            if(res.status==200) {
+                //mensaje.innerHTML = res.data;                
+                $.each(res.data, function(i,item){
+                    //console.log(item.nombre)
+                    if(item.id==cli_id){
+                        selected="selected";
+                    }
+                    else{
+                        selected="";
+                    }
+                    option='<option '+selected+' id=\"'+item.id+'\">'+item.nombre+'</option>'
+                    $('#empresa').append(option)
+                });
+            }
+        });
+
+        //llenamos el combo de clientes
+        axios.get('http://localhost:8000/cliente-get/', {
+            responseType: 'text'
+        })
+        .then(function(res) {
+            selected="";
+            if(res.status==200) {
+                //mensaje.innerHTML = res.data;
+                
+                $.each(res.data, function(i,item){
+                    if(item.id==cli_id){
+                        selected="selected";
+                    }
+                    else{
+                        selected="";
+                    }
+                    //console.log(item.nombre)
+                    option='<option '+selected+' id=\"'+item.id+'\">'+item.nombre+' '+item.apellido+'</option>'
+                    $('#cliente').append(option)
+                });
+            }
+
+        });
     });
 
 
 
     
     $('#btn_enviar').click(function(){
-        let nombre= $('#nombre').val();
-        let apellido= $('#apellido').val();
-        let rut= $('#rut').val();
-        data='{"nombre":"'+nombre+'", "apellido":"'+apellido+'","rut":"'+rut+'"}';       
-        $('#data').val(data);           
+        let cliente= $('#cliente').children(":selected").attr('id');
+        //let cliente= $('#cliente').children(":selected").val();
+        let empresa= $('#empresa').children(":selected").attr('id');
+        //let empresa= $('#empresa').children(":selected").val();
+        let dias= $('#dias').val();
+        let costo= $('#costo').val();
+        let fecha= $('#fecha').val().split("-");
+        let new_fecha=fecha[0]+'-'+fecha[1]+'-'+fecha[2]
+
+
+        data='{"cliente":"'+cliente+'","empresa":"'+empresa+'","dias":"'+dias+'","costo_diario":"'+costo+'","fecha_arriendo":"'+new_fecha+'"}';  
+        $('#data').val(data);
+         alert(data); 
+                   
         //axios.post(url, data, headers)
-        $('#cliente_new').submit();
+        $('#arriendo_edit').submit();
         
     });
 </script>

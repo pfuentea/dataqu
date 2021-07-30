@@ -5,7 +5,7 @@
         <div class="form-group row">
             <label class="col-sm-1 col-form-label"></label>
             <div class="col-sm-4">
-                <h3>Nuevo Cliente</h3>
+                <h3>Nueva Empresa</h3>
             </div>
         </div>
         <div class="form-group row">
@@ -28,7 +28,7 @@
     
     $('#btn_enviar').click(function(){
         let nombre= $('#nombre').val();
-        data='{"nombre":"'+nombre+'}';       
+        data='{"nombre":"'+nombre+'"}';       
         $('#data').val(data);           
         //axios.post(url, data, headers)
         $('#empresa_new').submit();

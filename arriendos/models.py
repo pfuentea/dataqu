@@ -23,5 +23,4 @@ class Arriendo(models.Model):
     dias = models.IntegerField()
     fecha_arriendo = models.DateField()
 
-    def __str__(self):
-        return self.cliente+'/'+self.empresa
+   
