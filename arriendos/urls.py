@@ -49,4 +49,13 @@ urlpatterns = [
     path('arriendos/',views.ListaArriendos,name='arriendos'),
     path('newarriendo',views.newarriendo,name='newarriendo'),
     path('updarriendo/<int:id>',views.updarriendo,name='updarriendo'),
+
+    path('desafio4/',views.getCompanyClientSortByName,name='desafio4'),
+    path('desafio5/',views.getClientsSortByAmount,name='desafio5'),
+    path('desafio5/<int:id>',views.getClientsSortByAmount,name='desafio5'),
+    path('desafio6/',views.getCompaniesSortByProfit,name='desafio6'),
+    path('desafio7/',views.getCompaniesWithRentOver1Week,name='desafio7'),
+    path('desafio8/',views.getClientsWithLessExpense,name='desafio8'),
+    
+    
 ]

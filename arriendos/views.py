@@ -244,6 +244,22 @@ def getClientLessExpenses(request,emp_id=0):
     expensive['nombre']=nombre+' '+apellido
     return Response(expensive)
 
+def getClientLessExpenses2(emp_id=0):
+    if emp_id == 0:
+        clientes_gastos = Arriendo.objects.values("cliente").annotate(
+        suma_total=Sum( F('dias') * F('costo_diario'))
+        ).order_by('suma_total')
+    else:
+        clientes_gastos = Arriendo.objects.values("cliente").filter(empresa=emp_id).annotate(
+        suma_total=Sum( F('dias') * F('costo_diario'))
+        ).order_by('suma_total')
+
+    cliente= Cliente.objects.filter(id=clientes_gastos[0]['cliente']).values('id')
+    id=cliente[0]['id']
+    expensive=clientes_gastos[0]
+    expensive['id']=id
+    return id
+
 @api_view(['GET'])
 def TotalArriendosMes(request):
     today = datetime.date.today()
@@ -282,3 +298,86 @@ def updarriendo(request,id=0):
         'id':id
     }
     return render(request,'arriendo_edit.html',context)
+
+@api_view(['GET'])
+def getCompanyClientSortByName(request):
+    empresas = Empresa.objects.all()  
+    empresas = [{
+        emp.nombre : [
+            getClienteByEMpresa(emp.id)
+        ]
+    }for emp in empresas]
+    context={
+        "data":empresas
+    } 
+    print(empresas)
+    return JsonResponse(context)
+
+def getClienteByEMpresa(emp_id):
+    clientes = Cliente.objects.filter(arriendo__empresa=emp_id).values('rut').order_by('nombre')
+    #print(clientes)
+    clientes = list(clientes)
+    return clientes
+
+@api_view(['GET'])
+def getClientsSortByAmount(request,id=0):
+    if id == 0:
+        clientes_gastos = Arriendo.objects.annotate(
+            suma_total=Sum( F('dias') * F('costo_diario'))
+            ).order_by('-suma_total').filter(suma_total__gte=40000)
+    else:
+        clientes_gastos = Arriendo.objects.filter(empresa=id).annotate(
+            suma_total=Sum( F('dias') * F('costo_diario'))
+            ).order_by('-suma_total').filter(suma_total__gte=40000)
+    resultado=[{
+        cg.cliente.rut: cg.suma_total
+    } for cg in clientes_gastos]
+    
+    context={
+        "data":resultado
+    } 
+    return JsonResponse(context)
+
+def getCompaniesSortByProfit(request):
+    empresa_profit = Arriendo.objects.values("empresa").annotate(
+        suma_total=Sum( F('dias') * F('costo_diario'))
+        ).order_by('suma_total')
+    expensive=empresa_profit[0]
+    empresa_profit = list(empresa_profit)
+    context={
+        "data":empresa_profit
+    } 
+    return JsonResponse(context)
+
+def getCompaniesWithRentOver1Week(request):
+    
+    empresas_clientes=Arriendo.objects.filter(dias__gt=6).annotate(cantidad=Count('cliente'))
+    print(empresas_clientes)
+    
+    empresas_clientes = [{
+        arr.empresa.nombre : arr.cantidad
+    } for arr in empresas_clientes]
+    empresas_clientes = list(empresas_clientes)
+    print(empresas_clientes)
+    context={
+        "data":empresas_clientes
+    } 
+    return JsonResponse(context)
+
+
+@api_view(['GET'])
+def getClientsWithLessExpense(request):
+    empresas = Empresa.objects.all()
+    empresas = [{
+        emp.nombre : getClientLessExpenses2(emp.id)        
+    }for emp in empresas]
+
+    empresas = list(empresas)
+    print(empresas)
+    context={
+        "data":empresas
+    } 
+    return JsonResponse(context)
+
+def newClientRanking():
+    pass
